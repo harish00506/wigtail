@@ -1,0 +1,612 @@
+/*
+ * ════════════════════════════════════════════════════════════════
+ * FURZE FARMHOUSE — src/styles/main.css
+ * ════════════════════════════════════════════════════════════════
+ * Extracted verbatim from the static index.html <style> block.
+ * Imported once in src/main.jsx so all React components share it.
+ *
+ * DESIGN TOKENS    → :root { --color-* --font-* --nav-height }
+ * BUTTON SYSTEM    → .btn + one modifier class (see catalogue below)
+ * SECTION CLASSES  → .hero .features .retreat .process .amenities
+ *                    .family .activities .hosting .escape .details
+ *                    .place .faq .cta-escape .contact .newsletter
+ *                    .footer
+ * RESPONSIVE       → @media (max-width: 768px) at the bottom
+ *
+ * Do NOT edit design values here without updating content.json
+ * and the Wagtail StreamField models in wagtail/models.py.
+ * ════════════════════════════════════════════════════════════════
+ */
+
+
+
+    /* ══════════════════════════════════════════════════════════════
+       CSS DESIGN TOKENS
+       All brand colours and font stacks in one place.
+       ──────────────────────────────────────────────────────────────
+       --color-bg              white page background
+       --color-text            dark primary text #1a1a1a
+       --color-text-muted      secondary / body copy #555
+       --color-tag             small category label colour
+       --color-border          dark outlined-button border
+       --color-nav-link        nav anchor colour
+       --color-btn-primary-bg  filled-black button background
+       --color-btn-primary-txt filled-black button text
+       --font-display          Playfair Display — headings
+       --font-body             DM Sans — body, nav, buttons
+       --nav-height            fixed nav height; hero offsets by this
+    ══════════════════════════════════════════════════════════════ */
+    :root {
+      --color-bg:               #ffffff;
+      --color-text:             #1a1a1a;
+      --color-text-muted:       #555555;
+      --color-tag:              #1a1a1a;
+      --color-border:           #1a1a1a;
+      --color-nav-link:         #1a1a1a;
+      --color-btn-primary-bg:   #1a1a1a;
+      --color-btn-primary-text: #ffffff;
+      --font-display:           'Playfair Display', Georgia, serif;
+      --font-body:              'DM Sans', system-ui, sans-serif;
+      --nav-height:             56px;
+    }
+
+
+    /* ── GLOBAL RESET ──────────────────────────────────────────────
+       Universal box-sizing so padding never expands element widths.
+       Smooth scroll animates anchor link navigation.
+       Images are block to remove inline spacing gaps.
+    ─────────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a   { text-decoration: none; color: inherit; }
+
+
+    /* ── NAVIGATION ────────────────────────────────────────────────
+       Fixed to viewport top, stays visible on scroll.
+       backdrop-filter blur keeps it readable over images.
+       Three zones: logo left · links centre · Book CTA right.
+       Hero has margin-top: var(--nav-height) to avoid being hidden.
+       .nav__book uses its own class (not the shared .btn system)
+       to control its appearance independently from section buttons.
+    ─────────────────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: var(--nav-height);
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    /* Logo: circular dark icon + two-line stacked brand name */
+    .nav__logo { display: flex; align-items: center; gap: 10px; }
+    .nav__logo-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #1a1a1a; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .nav__logo-icon svg { width: 22px; height: 22px; fill: #fff; }
+    .nav__logo-name { font-family: var(--font-body); font-size: 13px; font-weight: 500; line-height: 1.3; color: var(--color-text); }
+    .nav__logo-name span { display: block; } /* stacks "Furze" above "Farmhouse" */
+    /* Centre links */
+    .nav__links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav__links a { font-size: 13.5px; font-weight: 400; color: var(--color-nav-link); letter-spacing: 0.01em; }
+    .nav__links a:hover { opacity: 0.65; }
+    /* "More" has an inline chevron dropdown indicator */
+    .nav__more { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .nav__more-chevron { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+    .nav__more-chevron svg { width: 12px; height: 12px; stroke: currentColor; fill: none; }
+    /* Filled black Book CTA — right zone */
+    .nav__book {
+      background: var(--color-btn-primary-bg); color: var(--color-btn-primary-text);
+      font-family: var(--font-body); font-size: 13.5px; font-weight: 500;
+      padding: 9px 22px; border-radius: 4px; border: none;
+      cursor: pointer; letter-spacing: 0.01em; transition: opacity 0.18s;
+    }
+    .nav__book:hover { opacity: 0.82; }
+
+
+    /* ── SECTION 1 · HERO ──────────────────────────────────────────
+       Full-viewport-height (minus nav) background image.
+       Layered (bottom → top):
+         .hero__image-fallback  green gradient while img loads
+         .hero__image           farmhouse exterior photo
+         .hero__overlay         dark gradient for text legibility
+         .hero__content         centred heading, body, two buttons
+       Uses loading="eager" — it's above the fold.
+       Buttons: btn--outline-white on both Explore and Book.
+    ─────────────────────────────────────────────────────────────── */
+    .hero {
+      position: relative; margin-top: var(--nav-height);
+      width: 100%; height: calc(100vh - var(--nav-height)); min-height: 520px; overflow: hidden;
+    }
+    .hero__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; filter: brightness(0.72); }
+    .hero__image-fallback { position: absolute; inset: 0; background: linear-gradient(160deg, #b0c4b1 0%, #7a9e7e 40%, #4a6741 100%); }
+    .hero__overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.52) 100%); }
+    .hero__content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 24px; padding-top: 60px; }
+    .hero__heading { font-family: var(--font-display); font-size: clamp(34px, 5vw, 58px); font-weight: 800; line-height: 1.12; color: #ffffff; max-width: 620px; margin-bottom: 20px; letter-spacing: -0.01em; }
+    .hero__body { font-size: 15px; font-weight: 400; line-height: 1.65; color: rgba(255,255,255,0.90); max-width: 480px; margin-bottom: 30px; }
+    .hero__ctas { display: flex; gap: 14px; } /* inline row of two outline-white buttons */
+
+
+    /* ══════════════════════════════════════════════════════════════
+       BUTTON SYSTEM — complete catalogue used across all sections
+       ══════════════════════════════════════════════════════════════
+       Every button = base class .btn + ONE modifier below.
+
+       MODIFIER              APPEARANCE              USED ON BG
+       ────────────────────────────────────────────────────────────
+       btn--primary          black fill/white text    nav only
+       btn--primary-blue     #3366dd fill/white text  white, light-blue
+       btn--outline-dark     transparent/dark border  white, light-blue
+       btn--outline-white    transparent/white border blue
+       btn--text-arrow       no box/muted dark text   white, light-blue
+       btn--text-arrow-white no box/white text        blue
+
+       SIZE MODIFIER (stack with any above):
+       btn--sm               smaller padding + font
+
+       Quick reference:
+         Hero Explore / Book        → btn btn--outline-white
+         Feature cards Explore      → btn btn--outline-dark
+         Feature cards Learn More   → btn btn--text-arrow
+         Amenities Explore/Discover → btn btn--outline-white
+         FAQ Contact Us             → btn btn--primary-blue
+         CTA Book                   → btn btn--primary-blue
+         CTA Inquire                → btn btn--outline-dark
+         Contact Get Directions     → btn btn--outline-white btn--sm
+    ══════════════════════════════════════════════════════════════ */
+
+    /* Base — shared structure; border transparent keeps layout stable */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-body); font-size: 13.5px; font-weight: 500;
+      line-height: 1; padding: 10px 22px; border-radius: 4px;
+      border: 1.5px solid transparent; cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+      letter-spacing: 0.01em; white-space: nowrap; text-decoration: none;
+    }
+    /* Size modifier — smaller variant (e.g. Contact section Get Directions) */
+    .btn--sm { font-size: 12.5px; padding: 7px 16px; }
+
+    /* Filled black — nav Book button only */
+    .btn--primary { background: var(--color-btn-primary-bg); color: var(--color-btn-primary-text); border-color: var(--color-btn-primary-bg); }
+    .btn--primary:hover { opacity: 0.82; }
+
+    /* Filled brand blue — main conversion actions: Book, Contact Us, Sign up */
+    .btn--primary-blue { background: #3366dd; color: #ffffff; border-color: #3366dd; }
+    .btn--primary-blue:hover { background: #2a55c2; border-color: #2a55c2; }
+
+    /* Outlined dark — on white or light-blue (#b8ccee) backgrounds */
+    .btn--outline-dark { background: transparent; color: var(--color-text); border-color: var(--color-border); }
+    .btn--outline-dark:hover { background: rgba(0,0,0,0.04); }
+
+    /* Outlined white — on blue (#3366dd) backgrounds */
+    .btn--outline-white { background: transparent; color: #ffffff; border-color: rgba(255,255,255,0.80); }
+    .btn--outline-white:hover { background: rgba(255,255,255,0.12); }
+
+    /* Text + arrow dark — no border, muted text, on white or light-blue bg */
+    .btn--text-arrow { background: transparent; color: var(--color-text-muted); border-color: transparent; padding-left: 2px; padding-right: 2px; font-weight: 400; }
+    .btn--text-arrow:hover { color: var(--color-text); }
+
+    /* Text + arrow white — no border, white text, on blue bg */
+    .btn--text-arrow-white { background: transparent; color: rgba(255,255,255,0.82); border-color: transparent; padding-left: 2px; padding-right: 2px; font-weight: 400; }
+    .btn--text-arrow-white:hover { color: #ffffff; }
+
+
+    /* ── SECTION 2 · FEATURE LIST ──────────────────────────────────
+       Five alternating image-left/text-right rows on white bg.
+       Each <article class="feature"> = 2-col grid (image + text).
+       onerror on each img shows a coloured placeholder div when
+       the image file is missing during development.
+       Per-row buttons: btn--outline-dark + btn--text-arrow
+    ─────────────────────────────────────────────────────────────── */
+    .features { padding: 0; }
+    /* Single feature row — 2-col grid, centred, generous vertical padding */
+    .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 0; max-width: 960px; margin: 0 auto; padding: 88px 48px; align-items: center; }
+    /* Image column — capped width, rounded corners */
+    .feature__image-wrap { width: 100%; max-width: 340px; }
+    .feature__image-wrap img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 6px; display: block; background: #e8ebe6; }
+    /* Dev placeholder — toggled via onerror JS if image file missing */
+    .feature__img-placeholder { width: 100%; aspect-ratio: 4/3; border-radius: 6px; background: #d4ddd2; display: flex; align-items: center; justify-content: center; color: #8a9e88; font-size: 13px; }
+    /* Text column — padded left to create visual gap from image */
+    .feature__text { padding-left: 64px; }
+    /* Small category label e.g. "Essentials", "Highlights", "Comfort" */
+    .feature__tag { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--color-tag); margin-bottom: 12px; }
+    .feature__heading { font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 40px); font-weight: 800; line-height: 1.12; color: var(--color-text); margin-bottom: 16px; letter-spacing: -0.01em; }
+    .feature__body { font-size: 14px; font-weight: 400; line-height: 1.70; color: var(--color-text-muted); max-width: 300px; margin-bottom: 24px; }
+    .feature__ctas { display: flex; align-items: center; gap: 6px; } /* outlined + text-arrow side by side */
+
+
+    /* ── SECTION 3 · RETREAT ───────────────────────────────────────
+       Background: light blue #b8ccee
+       2-col grid — text LEFT / countryside photo RIGHT.
+       Text side includes a 2-col sub-feature mini-grid (icon + label
+       + description) for "The hot tub" and "The garden".
+       Icons are inline stroke SVGs (dark colour on light bg).
+       Buttons: Explore (btn--outline-dark) · Learn More (btn--text-arrow)
+    ─────────────────────────────────────────────────────────────── */
+    .retreat { background: #b8ccee; padding: 80px 0; }
+    .retreat__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .retreat__tag { font-size: 11px; font-weight: 500; color: #1a1a1a; margin-bottom: 12px; }
+    .retreat__heading { font-family: var(--font-display); font-size: clamp(28px,3.5vw,40px); font-weight: 800; line-height: 1.12; color: #1a1a1a; margin-bottom: 16px; letter-spacing: -0.01em; }
+    .retreat__body { font-size: 14px; line-height: 1.7; color: #2a2a2a; margin-bottom: 28px; }
+    /* 2-col mini-feature grid below the body text */
+    .retreat__sub-features { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .retreat__sub-feature-icon { width: 28px; height: 28px; margin-bottom: 8px; opacity: 0.70; }
+    .retreat__sub-feature-icon svg { width: 100%; height: 100%; stroke: #1a1a1a; fill: none; stroke-width: 1.8; }
+    .retreat__sub-feature-label { font-size: 13.5px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .retreat__sub-feature-desc { font-size: 13px; color: #333; line-height: 1.55; }
+    /* Right-column photo */
+    .retreat__image { width: 100%; aspect-ratio: 4/3.5; object-fit: cover; border-radius: 10px; background: #ccc; }
+
+
+    /* ── SECTION 4 · PROCESS ───────────────────────────────────────
+       Background: white, content inside a dashed blue border box.
+       Tag "Process" appears in blue to match the dashed border.
+       3-col grid of photo cards — each card has:
+         · Full-bleed photo background
+         · Bottom-heavy dark gradient overlay
+         · Overlaid text: step number · heading · subline · link
+       Step links use .process__step-cta (white inline text, no box)
+       rather than the shared .btn system.
+    ─────────────────────────────────────────────────────────────── */
+    .process { background: #ffffff; padding: 80px 24px; }
+    /* Dashed blue container frames all 3 steps together */
+    .process__container { max-width: 900px; margin: 0 auto; border: 1.5px dashed #5599dd; border-radius: 8px; padding: 48px 40px 52px; }
+    .process__tag { text-align: center; font-size: 11px; font-weight: 500; color: #5599dd; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .process__heading { font-family: var(--font-display); font-size: clamp(30px,4vw,46px); font-weight: 800; text-align: center; color: #1a1a1a; line-height: 1.1; margin-bottom: 10px; }
+    .process__subtitle { text-align: center; font-size: 14px; color: #555; margin-bottom: 40px; }
+    .process__steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    /* Each card is position:relative so overlay + text can be absolute */
+    .process__step { border-radius: 8px; overflow: hidden; position: relative; background: #ccc; }
+    .process__step-img { width: 100%; aspect-ratio: 3/3.5; object-fit: cover; display: block; }
+    /* Bottom-heavy gradient over the photo for white text legibility */
+    .process__step-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.08) 55%, transparent 100%); }
+    /* Text block pinned to card bottom */
+    .process__step-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px; color: #fff; }
+    .process__step-number { font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; margin-bottom: 8px; opacity: 0.85; }
+    .process__step-heading { font-family: var(--font-display); font-size: 20px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .process__step-subline { font-size: 12px; opacity: 0.80; margin-bottom: 10px; }
+    /* Lightweight white text link — not using shared .btn to keep it minimal */
+    .process__step-cta { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 400; }
+    .process__step-cta:hover { color: #fff; }
+
+
+    /* ── SECTION 5 · AMENITIES ─────────────────────────────────────
+       Background: brand blue #3366dd
+       4-col icon grid. Each item: stroke SVG icon → bold heading
+       → optional body text → optional italic footnote → optional CTA.
+       Cols 1 & 2 have btn--outline-white buttons (Explore / Discover).
+       Cols 3 & 4 have body text only (no button).
+       Col 4 also has a small italic accessibility note.
+       Section footer: btn--text-arrow-white "Learn More →".
+    ─────────────────────────────────────────────────────────────── */
+    .amenities { background: #3366dd; padding: 72px 0; }
+    .amenities__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+    .amenities__tag { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.80); margin-bottom: 12px; }
+    .amenities__heading { font-family: var(--font-display); font-size: clamp(28px,3.5vw,42px); font-weight: 800; line-height: 1.1; color: #fff; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .amenities__subtitle { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 48px; }
+    /* 4-col grid */
+    .amenities__grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 40px; margin-bottom: 40px; }
+    /* White stroke SVG icons */
+    .amenities__item-icon { width: 36px; height: 36px; margin-bottom: 14px; }
+    .amenities__item-icon svg { width: 100%; height: 100%; stroke: rgba(255,255,255,0.90); fill: none; stroke-width: 1.6; }
+    .amenities__item-heading { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.45; margin-bottom: 10px; }
+    .amenities__item-body { font-size: 13px; color: rgba(255,255,255,0.80); line-height: 1.6; margin-bottom: 10px; }
+    /* Italic accessibility disclaimer — col 4 only */
+    .amenities__item-note { font-size: 11.5px; font-style: italic; color: rgba(255,255,255,0.55); line-height: 1.55; }
+
+
+    /* ── SECTION 6 · FAMILY ────────────────────────────────────────
+       Background: light blue #b8ccee
+       2-col grid — photo LEFT / text RIGHT (reverse of Section 3).
+       Text side has: tag · heading · body · 2-col stats (4 / 3) · CTA.
+       Stats are large Playfair Display numbers with small labels.
+       Button: btn--text-arrow forced to dark colour via inline style.
+    ─────────────────────────────────────────────────────────────── */
+    .family { background: #b8ccee; padding: 80px 0; }
+    .family__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .family__image { width: 100%; aspect-ratio: 4/3.5; object-fit: cover; border-radius: 10px; background: #ccc; }
+    .family__tag { font-size: 11px; font-weight: 500; color: #1a1a1a; margin-bottom: 12px; }
+    .family__heading { font-family: var(--font-display); font-size: clamp(28px,3.5vw,40px); font-weight: 800; line-height: 1.12; color: #1a1a1a; margin-bottom: 16px; letter-spacing: -0.01em; }
+    .family__body { font-size: 14px; line-height: 1.7; color: #2a2a2a; margin-bottom: 28px; }
+    /* 2-col large number stats */
+    .family__stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+    .family__stat-value { font-family: var(--font-display); font-size: 52px; font-weight: 800; color: #1a1a1a; line-height: 1; margin-bottom: 6px; }
+    .family__stat-label { font-size: 13px; color: #333; line-height: 1.45; }
+
+
+    /* ── SECTION 7 · ACTIVITIES ────────────────────────────────────
+       Background: white
+       Centred tag + heading + subtitle then 3-col photo card grid.
+       Each card: rounded photo → centred heading → centred body.
+       Footer: centred btn--outline-dark "Learn More →".
+    ─────────────────────────────────────────────────────────────── */
+    .activities { background: #ffffff; padding: 80px 0; }
+    .activities__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+    .activities__tag { text-align: center; font-size: 11px; font-weight: 500; color: #555; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .activities__heading { font-family: var(--font-display); font-size: clamp(30px,4vw,46px); font-weight: 800; text-align: center; color: #1a1a1a; line-height: 1.1; margin-bottom: 12px; }
+    .activities__subtitle { text-align: center; font-size: 14px; color: #555; max-width: 480px; margin: 0 auto 48px; line-height: 1.6; }
+    /* 3-col card grid */
+    .activities__grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-bottom: 40px; }
+    .activities__card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; margin-bottom: 18px; background: #ddd; display: block; }
+    .activities__card-heading { font-family: var(--font-display); font-size: 20px; font-weight: 800; line-height: 1.2; color: #1a1a1a; margin-bottom: 10px; text-align: center; }
+    .activities__card-body { font-size: 13.5px; color: #555; line-height: 1.6; text-align: center; }
+    .activities__footer { text-align: center; } /* centres the Learn More button */
+
+
+    /* ── SECTION 8 · HOSTING ───────────────────────────────────────
+       Background: brand blue #3366dd — TWO visual zones:
+       Zone A (.hosting__header): centred tag · heading · subtitle ·
+               Organize (outline-white) + Learn More (text-arrow-white)
+       Zone B (.hosting__split): 2-col — yoga photo LEFT,
+               static accordion (3 items, white dividers) RIGHT.
+       Accordion items are always visible (no JS toggle).
+    ─────────────────────────────────────────────────────────────── */
+    .hosting { background: #3366dd; padding: 80px 0; }
+    /* Zone A — centred header */
+    .hosting__header { max-width: 960px; margin: 0 auto; padding: 0 48px; text-align: center; margin-bottom: 52px; }
+    .hosting__tag { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; margin-bottom: 12px; }
+    .hosting__heading { font-family: var(--font-display); font-size: clamp(30px,4vw,46px); font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 14px; }
+    .hosting__subtitle { font-size: 14px; color: rgba(255,255,255,0.82); max-width: 440px; margin: 0 auto 24px; line-height: 1.6; }
+    .hosting__ctas { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    /* Zone B — split */
+    .hosting__split { max-width: 960px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .hosting__image { width: 100%; aspect-ratio: 4/4; object-fit: cover; border-radius: 10px; background: #ccc; }
+    /* Accordion items separated by semi-transparent white dividers */
+    .hosting__accordion-item { padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,0.25); }
+    .hosting__accordion-item:first-child { border-top: 1px solid rgba(255,255,255,0.25); }
+    .hosting__accordion-heading { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .hosting__accordion-body { font-size: 13.5px; color: rgba(255,255,255,0.80); line-height: 1.65; }
+
+
+    /* ── SECTION 9 · ESCAPE ────────────────────────────────────────
+       Background: white
+       Centred header (tag · heading · subtitle · CTA row), then
+       2-col split — window photo LEFT / divider list RIGHT.
+       Divider list: 3 items (Quiet mornings · Room to breathe ·
+       Lindores Abbey), each separated by top/bottom thin rules.
+       Buttons: Explore (btn--outline-dark) · Learn More (btn--text-arrow)
+    ─────────────────────────────────────────────────────────────── */
+    .escape { background: #fff; padding: 80px 0; }
+    /* Centred header — constrained for readability */
+    .escape__header { max-width: 960px; margin: 0 auto; padding: 0 48px; text-align: center; margin-bottom: 56px; }
+    .escape__tag { font-size: 11px; font-weight: 500; color: #555; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .escape__heading { font-family: var(--font-display); font-size: clamp(32px,4.5vw,50px); font-weight: 800; line-height: 1.1; color: #1a1a1a; margin-bottom: 16px; }
+    .escape__subtitle { font-size: 14px; color: #555; max-width: 460px; margin: 0 auto 24px; line-height: 1.65; }
+    .escape__ctas { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    /* 2-col split: photo left, divider list right */
+    .escape__split { max-width: 960px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .escape__image { width: 100%; aspect-ratio: 4/3.5; object-fit: cover; border-radius: 10px; background: #ccc; }
+    /* Divider list items with thin border top/bottom rules */
+    .escape__list-item { padding: 22px 0; border-bottom: 1px solid rgba(0,0,0,0.10); }
+    .escape__list-item:first-child { border-top: 1px solid rgba(0,0,0,0.10); }
+    .escape__list-heading { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .escape__list-body { font-size: 13.5px; color: #555; line-height: 1.65; }
+
+
+    /* ── SECTION 10 · DETAILS ──────────────────────────────────────
+       Background: brand blue #3366dd
+       Left-aligned tag · heading · subtitle (max 480px wide).
+       3-col grid of outlined stat boxes (white semi-transparent border).
+       Each box: large display number → bold label → small description.
+       Numbers: 4 (parking) · 3 (dogs) · 12 (garden steps).
+       Footer: single btn--outline-white "Learn More →".
+    ─────────────────────────────────────────────────────────────── */
+    .details { background: #3366dd; padding: 72px 0; }
+    .details__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+    .details__tag { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.80); margin-bottom: 12px; }
+    .details__heading { font-family: var(--font-display); font-size: clamp(28px,3.5vw,42px); font-weight: 800; line-height: 1.1; color: #fff; margin-bottom: 12px; letter-spacing: -0.01em; }
+    .details__subtitle { font-size: 14px; color: rgba(255,255,255,0.82); max-width: 480px; margin-bottom: 40px; line-height: 1.6; }
+    /* 3 outlined stat boxes */
+    .details__stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 36px; }
+    .details__stat-box { border: 1.5px solid rgba(255,255,255,0.35); border-radius: 6px; padding: 28px 24px 24px; }
+    .details__stat-value { font-family: var(--font-display); font-size: 56px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 16px; }
+    .details__stat-label { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .details__stat-desc { font-size: 12.5px; color: rgba(255,255,255,0.75); }
+
+
+    /* ── SECTION 11 · PLACE / NEWBURGH ────────────────────────────
+       Background: light blue #b8ccee
+       Very large display heading "Newburgh" + subtitle.
+       2-col split: location list LEFT / photo RIGHT.
+       Location list: two entries (Newburgh · Lindores Abbey),
+       each with heading, address, bold underline-on-hover link.
+    ─────────────────────────────────────────────────────────────── */
+    .place { background: #b8ccee; padding: 72px 0; }
+    .place__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+    .place__tag { font-size: 11px; font-weight: 500; color: #1a1a1a; margin-bottom: 12px; }
+    /* Very large display-size heading */
+    .place__heading { font-family: var(--font-display); font-size: clamp(36px,5vw,60px); font-weight: 800; color: #1a1a1a; line-height: 1.05; margin-bottom: 10px; }
+    .place__subtitle { font-size: 14px; color: #333; margin-bottom: 40px; line-height: 1.6; }
+    /* 2-col split */
+    .place__split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    .place__locations { display: flex; flex-direction: column; gap: 32px; }
+    .place__location-heading { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .place__location-address { font-size: 13px; color: #333; margin-bottom: 8px; }
+    .place__location-link { font-size: 13px; font-weight: 600; color: #1a1a1a; text-decoration: none; }
+    .place__location-link:hover { text-decoration: underline; }
+    .place__image { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; background: #ccc; }
+
+
+    /* ── SECTION 12 · FAQ ──────────────────────────────────────────
+       Background: white — narrow centred column (max 620px).
+       5 accordion items toggled via inline onclick → .is-open class.
+       CSS: .faq__answer hidden by default, shown when .is-open present.
+       Chevron icon rotates 180° when item is open.
+       First item has "is-open" in the HTML so it starts expanded.
+       Below accordion: "Still have questions?" + btn--primary-blue CTA.
+    ─────────────────────────────────────────────────────────────── */
+    .faq { background: #fff; padding: 80px 0; }
+    .faq__inner { max-width: 620px; margin: 0 auto; padding: 0 24px; }
+    .faq__heading { font-family: var(--font-display); font-size: clamp(32px,4vw,48px); font-weight: 800; text-align: center; color: #1a1a1a; margin-bottom: 10px; }
+    .faq__subtitle { font-size: 14px; color: #555; text-align: center; margin-bottom: 48px; }
+    /* Each item — top border added; last item also gets bottom */
+    .faq__item { border-top: 1px solid rgba(0,0,0,0.12); }
+    .faq__item:last-of-type { border-bottom: 1px solid rgba(0,0,0,0.12); }
+    /* Clickable question row — flexbox pushes chevron to the right */
+    .faq__question { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; cursor: pointer; font-size: 14px; font-weight: 500; color: #1a1a1a; }
+    /* Chevron — rotates via CSS when .is-open on parent */
+    .faq__chevron { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.2s; }
+    .faq__chevron svg { width: 100%; height: 100%; stroke: #555; fill: none; stroke-width: 1.8; }
+    .faq__item.is-open .faq__chevron { transform: rotate(180deg); }
+    /* Answer hidden by default; shown when parent has .is-open */
+    .faq__answer { display: none; font-size: 13.5px; color: #555; line-height: 1.65; padding-bottom: 18px; }
+    .faq__item.is-open .faq__answer { display: block; }
+    /* "Still have questions?" callout below the accordion */
+    .faq__still { margin-top: 56px; text-align: center; }
+    .faq__still-heading { font-family: var(--font-display); font-size: 30px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px; }
+    .faq__still-body { font-size: 14px; color: #555; margin-bottom: 20px; }
+
+
+    /* ── SECTION 13 · CTA ESCAPE ───────────────────────────────────
+       Background: light blue #b8ccee — fully centred layout.
+       Heading · subtitle · two CTA buttons:
+         Book    → btn--primary-blue (filled blue)
+         Inquire → btn--outline-dark (transparent dark border)
+       Wide 16:9 bedroom photo sits below the buttons.
+    ─────────────────────────────────────────────────────────────── */
+    .cta-escape { background: #b8ccee; padding: 80px 0; }
+    .cta-escape__inner { max-width: 820px; margin: 0 auto; padding: 0 48px; text-align: center; }
+    .cta-escape__heading { font-family: var(--font-display); font-size: clamp(32px,4.5vw,52px); font-weight: 800; color: #1a1a1a; line-height: 1.1; margin-bottom: 14px; }
+    .cta-escape__subtitle { font-size: 14px; color: #333; margin-bottom: 24px; line-height: 1.6; }
+    .cta-escape__ctas { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 40px; }
+    /* Wide bedroom photo below CTA buttons — 16:9 ratio, rounded corners */
+    .cta-escape__image { width: 100%; max-width: 700px; aspect-ratio: 16/9; object-fit: cover; border-radius: 10px; margin: 0 auto; background: #ccc; display: block; }
+
+
+    /* ── SECTION 14 · CONTACT ──────────────────────────────────────
+       Background: brand blue #3366dd
+       2-col split: contact details LEFT / Google Maps embed RIGHT.
+       Left: tag · heading · subtitle, then 3 stacked contact items
+       (Email · Phone · Location), each with icon, label, subline,
+       and value link or btn--outline-white btn--sm button.
+       Right: .contact__map holds a responsive <iframe>.
+       ACTION: replace iframe src with your actual Google Maps embed URL.
+    ─────────────────────────────────────────────────────────────── */
+    .contact { background: #3366dd; padding: 72px 0; }
+    /* 2-col split */
+    .contact__inner { max-width: 960px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .contact__tag { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.75); margin-bottom: 12px; }
+    .contact__heading { font-family: var(--font-display); font-size: clamp(28px,3.5vw,42px); font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+    .contact__subtitle { font-size: 14px; color: rgba(255,255,255,0.82); margin-bottom: 40px; }
+    /* Stacked list of contact methods */
+    .contact__items { display: flex; flex-direction: column; gap: 28px; }
+    .contact__item-icon { width: 22px; height: 22px; margin-bottom: 8px; }
+    .contact__item-icon svg { width: 100%; height: 100%; stroke: rgba(255,255,255,0.90); fill: none; stroke-width: 1.6; }
+    .contact__item-label { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .contact__item-sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 4px; }
+    .contact__item-link { font-size: 13.5px; color: rgba(255,255,255,0.90); font-weight: 500; }
+    .contact__item-link:hover { color: #fff; text-decoration: underline; }
+    /* Map container — aspect ratio maintained; iframe fills it completely */
+    .contact__map { width: 100%; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; background: #ccc; }
+    .contact__map iframe { width: 100%; height: 100%; border: none; display: block; }
+
+
+    /* ── SECTION 15 · NEWSLETTER ───────────────────────────────────
+       Background: white — centred column (max 640px).
+       Two-line large serif heading + subtitle.
+       Inline email form: input + submit button share a border edge
+       (input has no right border/radius; button has no left radius).
+       On mobile the form stacks vertically (see responsive block).
+       ACTION: wire form to your email marketing service.
+    ─────────────────────────────────────────────────────────────── */
+    .newsletter { background: #fff; padding: 88px 24px; }
+    .newsletter__inner { max-width: 640px; margin: 0 auto; text-align: center; }
+    .newsletter__heading { font-family: var(--font-display); font-size: clamp(34px,5vw,54px); font-weight: 800; color: #1a1a1a; line-height: 1.08; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .newsletter__subtitle { font-size: 14px; color: #555; margin-bottom: 32px; }
+    /* Joined input + button — no gap */
+    .newsletter__form { display: flex; gap: 0; max-width: 500px; margin: 0 auto 12px; }
+    /* Input: no right border so it flows into button */
+    .newsletter__input { flex: 1; padding: 11px 18px; font-family: var(--font-body); font-size: 14px; border: 1.5px solid #ccc; border-right: none; border-radius: 4px 0 0 4px; outline: none; color: #1a1a1a; }
+    .newsletter__input:focus { border-color: #3366dd; } /* blue focus on the visible three sides */
+    /* Button: rounds only right corners to complete the joined shape */
+    .newsletter__submit { padding: 11px 22px; background: #3366dd; color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 500; border: none; border-radius: 0 4px 4px 0; cursor: pointer; transition: background 0.18s; }
+    .newsletter__submit:hover { background: #2a55c2; }
+    .newsletter__note { font-size: 12px; color: #999; } /* small disclaimer below form */
+
+
+    /* ── FOOTER ────────────────────────────────────────────────────
+       Background: brand blue #3366dd
+       Two rows separated by a semi-transparent white border:
+         .footer__main   — logo · 5 nav links · 5 social icons
+         .footer__bottom — © copyright left · 3 legal links right
+       Social icons are fill-based SVGs (no stroke).
+    ─────────────────────────────────────────────────────────────── */
+    .footer { background: #3366dd; }
+    /* Top row: logo / nav / social — flex, space-between */
+    .footer__main { max-width: 960px; margin: 0 auto; padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    /* Logo — same structure as nav logo but lighter colours for blue bg */
+    .footer__logo { display: flex; align-items: center; gap: 10px; }
+    .footer__logo-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.20); display: flex; align-items: center; justify-content: center; }
+    .footer__logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+    .footer__logo-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.80); line-height: 1.3; }
+    .footer__logo-name span { display: block; } /* stacks "Furze" above "Farmhouse" */
+    /* Centre nav links */
+    .footer__nav { display: flex; gap: 28px; flex-wrap: wrap; }
+    .footer__nav a { font-size: 13px; color: rgba(255,255,255,0.80); font-weight: 400; }
+    .footer__nav a:hover { color: #fff; }
+    /* Social icon row — fill SVGs */
+    .footer__social { display: flex; gap: 14px; align-items: center; }
+    .footer__social a { display: flex; }
+    .footer__social svg { width: 18px; height: 18px; fill: rgba(255,255,255,0.80); transition: fill 0.15s; }
+    .footer__social a:hover svg { fill: #fff; }
+    /* Bottom bar: copyright + legal — separated by white border-top */
+    .footer__bottom { max-width: 960px; margin: 0 auto; padding: 18px 48px; border-top: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .footer__copy { font-size: 12px; color: rgba(255,255,255,0.60); margin-right: auto; }
+    .footer__legal a { font-size: 12px; color: rgba(255,255,255,0.65); }
+    .footer__legal a:hover { color: #fff; text-decoration: underline; }
+
+
+    /* ── RESPONSIVE OVERRIDES — max-width 768px (tablet/mobile) ────
+       Applied when viewport is ≤ 768px wide.
+       ─────────────────────────────────────────────────────────────
+       Navigation    nav centre links hidden (logo + Book remain)
+       S1 Hero       heading drops to fixed 32px
+       S2 Features   rows collapse to 1 col; image fills full width
+       S3 S6 S8      2-col splits → 1 col (retreat, family, hosting)
+       S9 S14 S11    2-col splits → 1 col (escape, contact, place)
+       S4 S5 S7 S10  multi-col grids → 1 col (process, amenities,
+                     activities, details)
+       S3 S6 sub     inner 2-col sub-grids stay 2-col (retreat sub-
+                     features, family stats — still readable at 2 col)
+       S4             process container reduced padding
+       Footer        rows go vertical, left-aligned
+       S15 Newsletter form stacks vertically; border-radius adjusted
+    ─────────────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav__links { display: none; } /* hide centre links on mobile */
+      .hero__heading { font-size: 32px; }
+      .feature { grid-template-columns: 1fr; padding: 56px 24px; }
+      .feature__image-wrap { max-width: 100%; }
+      .feature__text { padding-left: 0; padding-top: 32px; }
+      /* All 2-col section splits → single column */
+      .retreat__inner, .family__inner, .hosting__split,
+      .escape__split, .contact__inner, .place__split { grid-template-columns: 1fr; gap: 32px; padding: 0 24px; }
+      /* Multi-col grids → single column */
+      .process__steps, .amenities__grid, .activities__grid, .details__stats { grid-template-columns: 1fr; }
+      /* These 2-col inner grids stay 2-col — still compact enough */
+      .retreat__sub-features, .family__stats { grid-template-columns: 1fr 1fr; }
+      .process__container { padding: 28px 20px; }
+      /* Footer rows stack vertically */
+      .footer__main { flex-direction: column; align-items: flex-start; gap: 20px; padding: 32px 24px; }
+      .footer__bottom { padding: 16px 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
+      /* Newsletter: input stacks above button; radii adjusted for vertical join */
+      .newsletter__form { flex-direction: column; }
+      .newsletter__input { border-right: 1.5px solid #ccc; border-radius: 4px 4px 0 0; }
+      .newsletter__submit { border-radius: 0 0 4px 4px; }
+    }
+
+  

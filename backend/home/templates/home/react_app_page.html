@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }}</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #111827;
+            color: #e5e7eb;
+            font-family: Segoe UI, Arial, sans-serif;
+        }
+
+        .react-shell {
+            min-height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .react-shell__header {
+            padding: 12px 16px;
+            background: #1f2937;
+            border-bottom: 1px solid #374151;
+            font-size: 14px;
+        }
+
+        .react-shell__frame {
+            border: 0;
+            width: 100%;
+            height: calc(100vh - 48px);
+            background: #ffffff;
+        }
+
+        .react-shell__link {
+            color: #93c5fd;
+            text-decoration: none;
+        }
+
+        .react-shell__link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="react-shell">
+        <header class="react-shell__header">
+            React app source:
+            <a class="react-shell__link" href="{{ page.react_url }}" target="_blank" rel="noopener noreferrer">{{
+                page.react_url }}</a>
+        </header>
+        <iframe class="react-shell__frame" src="{{ page.react_url }}" title="{{ page.title }}" loading="lazy"
+            referrerpolicy="no-referrer"></iframe>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'frontend/app.css' %}">
+    <title>{{ page.title }}</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        const staticBundle = "{% static 'frontend/app.js' %}";
+        const viteCandidates = ['http://127.0.0.1:5173', 'http://127.0.0.1:5174'];
+
+        async function mountReactApp() {
+            try {
+                await import(staticBundle);
+                return;
+            } catch (error) {
+                // Fallback to Vite dev server if static bundle is not built.
+            }
+
+            for (const base of viteCandidates) {
+                try {
+                    await import(`${base}/@vite/client`);
+                    await import(`${base}/src/main.jsx`);
+                    return;
+                } catch (error) {
+                    // Try the next dev-server candidate.
+                }
+            }
+
+            document.body.innerHTML =
+                '<div style="font-family:Segoe UI,Arial,sans-serif;padding:24px;max-width:640px;line-height:1.6">' +
+                '<h2 style="margin:0 0 8px">React frontend is unavailable</h2>' +
+                '<p style="margin:0">Build static assets with <strong>npm run build</strong> or run the dev server with <strong>npm run dev</strong>, then refresh this page.</p>' +
+                '</div>';
+        }
+
+        mountReactApp();
+    </script>
+</body>
+
+</html>
